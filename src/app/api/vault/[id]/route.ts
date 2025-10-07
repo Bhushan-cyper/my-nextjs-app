@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import VaultItem from '@/models/VaultItem';
 import { requireAuth } from '@/lib/auth';
 
 export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-): Promise<NextResponse> {
+  request: Request,
+  context: unknown
+) {
   try {
     const user = requireAuth(request);
     await connectDB();
@@ -20,6 +20,7 @@ export async function PUT(
       );
     }
 
+    const { params } = context as { params: { id: string } };
     const vaultItem = await VaultItem.findOneAndUpdate(
       { _id: params.id, userId: user.userId },
       { encryptedData },
@@ -57,13 +58,14 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-): Promise<NextResponse> {
+  request: Request,
+  context: unknown
+) {
   try {
     const user = requireAuth(request);
     await connectDB();
 
+    const { params } = context as { params: { id: string } };
     const vaultItem = await VaultItem.findOneAndDelete({
       _id: params.id,
       userId: user.userId,
