@@ -38,7 +38,7 @@ export default function AuthForm() {
       if (!success) {
         setError(isLogin ? 'Invalid credentials' : 'Registration failed');
       }
-    } catch (error) {
+    } catch (_) {
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);

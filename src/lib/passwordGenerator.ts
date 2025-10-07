@@ -13,7 +13,7 @@ const NUMBERS = '0123456789';
 const SYMBOLS = '!@#$%^&*()_+-=[]{}|;:,.<>?';
 
 // Characters that look similar and might be confusing
-const SIMILAR_CHARS = 'il1Lo0O';
+// const SIMILAR_CHARS = 'il1Lo0O';
 
 export function generatePassword(options: PasswordOptions): string {
   let charset = '';

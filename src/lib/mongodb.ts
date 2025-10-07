@@ -12,7 +12,13 @@ interface CachedConnection {
   promise: Promise<typeof mongoose> | null;
 }
 
-const cached: CachedConnection = (global as any).mongoose || { conn: null, promise: null };
+declare global {
+  // eslint-disable-next-line no-var
+  var mongoose: CachedConnection | undefined;
+}
+
+const cached: CachedConnection = global.mongoose || { conn: null, promise: null };
+global.mongoose = cached;
 
 async function connectDB() {
   if (cached.conn) {

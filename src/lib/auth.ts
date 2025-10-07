@@ -21,7 +21,7 @@ export function verifyToken(request: NextRequest): AuthUser | null {
       userId: decoded.userId,
       email: decoded.email,
     };
-  } catch (error) {
+  } catch (_) {
     return null;
   }
 }

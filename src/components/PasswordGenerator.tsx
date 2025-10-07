@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { generatePassword, calculatePasswordStrength, PasswordOptions } from '@/lib/passwordGenerator';
 import { Copy, RefreshCw } from 'lucide-react';
 
@@ -22,11 +22,7 @@ export default function PasswordGenerator({ onPasswordGenerated }: PasswordGener
   const [strength, setStrength] = useState({ score: 0, feedback: '' });
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    generateNewPassword();
-  }, [options]);
-
-  const generateNewPassword = () => {
+  const generateNewPassword = useCallback(() => {
     try {
       const newPassword = generatePassword(options);
       setPassword(newPassword);
@@ -35,15 +31,19 @@ export default function PasswordGenerator({ onPasswordGenerated }: PasswordGener
         onPasswordGenerated(newPassword);
       }
     } catch (error) {
-      console.error('Password generation failed:', error);
+      setStrength({ score: 0, feedback: 'Error generating password' });
     }
-  };
+  }, [options, onPasswordGenerated]);
+
+  // Initial password generation on mount and when options change
+  useEffect(() => {
+    generateNewPassword();
+  }, [generateNewPassword]);
 
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(password);
       setCopied(true);
-      
       // Auto-clear after 15 seconds
       setTimeout(() => {
         setCopied(false);
@@ -191,3 +191,4 @@ export default function PasswordGenerator({ onPasswordGenerated }: PasswordGener
     </div>
   );
 }
+
