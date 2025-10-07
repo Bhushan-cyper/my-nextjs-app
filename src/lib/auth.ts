@@ -16,7 +16,7 @@ export function verifyToken(request: NextRequest): AuthUser | null {
       return null;
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload & AuthUser;
     return {
       userId: decoded.userId,
       email: decoded.email,

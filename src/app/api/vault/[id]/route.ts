@@ -40,8 +40,8 @@ export async function PUT(
       },
       { status: 200 }
     );
-  } catch (error: any) {
-    if (error.message === 'Authentication required') {
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === 'Authentication required') {
       return NextResponse.json(
         { message: 'Authentication required' },
         { status: 401 }

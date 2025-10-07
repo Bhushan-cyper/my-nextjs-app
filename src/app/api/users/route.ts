@@ -13,9 +13,10 @@ export async function POST(request: Request) {
       { message: 'User created successfully', data: user },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { message: 'Error creating user', error: error.message },
+      { message: 'Error creating user', error: errorMessage },
       { status: 500 }
     );
   }
@@ -30,9 +31,10 @@ export async function GET() {
       { data: users },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { message: 'Error fetching users', error: error.message },
+      { message: 'Error fetching users', error: errorMessage },
       { status: 500 }
     );
   }

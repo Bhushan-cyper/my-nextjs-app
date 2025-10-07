@@ -7,7 +7,12 @@ if (!MONGODB_URI) {
 }
 
 // Initialize cached variable
-let cached = (global as any).mongoose || { conn: null, promise: null };
+interface CachedConnection {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+}
+
+const cached: CachedConnection = (global as any).mongoose || { conn: null, promise: null };
 
 async function connectDB() {
   if (cached.conn) {
