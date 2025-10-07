@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
       { user: { id: user.userId, email: user.email } },
       { status: 200 }
     );
-  } catch (_) {
+  } catch {
+
     return NextResponse.json(
       { message: 'Authentication failed' },
       { status: 401 }

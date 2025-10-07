@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { VaultItemData, encryptData, decryptData, generateKey, generateSalt } from '@/lib/encryption';
 import { Search, Plus, Edit, Trash2, Copy, Eye, EyeOff, ExternalLink } from 'lucide-react';
 import VaultItemForm from './VaultItemForm';
@@ -31,11 +31,42 @@ export default function VaultList() {
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(new Set());
   const [copiedItems, setCopiedItems] = useState<Set<string>>(new Set());
 
+  const fetchVaultItems = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/vault');
+      if (response.ok) {
+        const data = await response.json();
+        const decryptedItems = data.data
+          .map((item: VaultItem) => {
+            const decryptedData = decryptData(item.encryptedData, encryptionKey);
+            if (!decryptedData) {
+              console.error('Failed to decrypt vault item:', item._id);
+              return null;
+            }
+            return {
+              ...decryptedData,
+              id: item._id,
+              createdAt: item.createdAt,
+              updatedAt: item.updatedAt,
+            };
+          })
+          .filter(Boolean);
+        
+        setVaultItems(decryptedItems);
+      }
+    } catch (error) {
+      console.error('Failed to fetch vault items:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [encryptionKey]);
+
   useEffect(() => {
     if (encryptionKey) {
       fetchVaultItems();
     }
-  }, [encryptionKey]);
+  }, [encryptionKey, fetchVaultItems]);
 
   useEffect(() => {
     // Filter items based on search term
@@ -67,36 +98,7 @@ export default function VaultList() {
     setShowMasterPasswordPrompt(false);
   };
 
-  const fetchVaultItems = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/vault');
-      if (response.ok) {
-        const data = await response.json();
-        const decryptedItems = data.data
-          .map((item: VaultItem) => {
-            const decryptedData = decryptData(item.encryptedData, encryptionKey);
-            if (!decryptedData) {
-              console.error('Failed to decrypt vault item:', item._id);
-              return null;
-            }
-            return {
-              ...decryptedData,
-              id: item._id,
-              createdAt: item.createdAt,
-              updatedAt: item.updatedAt,
-            };
-          })
-          .filter(Boolean);
-        
-        setVaultItems(decryptedItems);
-      }
-    } catch (error) {
-      console.error('Failed to fetch vault items:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   const handleSaveItem = async (data: VaultItemData) => {
     try {
@@ -336,7 +338,7 @@ export default function VaultList() {
       {/* Form Modal */}
       {showForm && (
         <VaultItemForm
-          item={editingItem}
+          item={editingItem ?? undefined}
           onSave={handleSaveItem}
           onCancel={() => {
             setShowForm(false);

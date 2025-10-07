@@ -6,7 +6,7 @@ import { requireAuth } from '@/lib/auth';
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
-) {
+): Promise<NextResponse> {
   try {
     const user = requireAuth(request);
     await connectDB();
@@ -59,7 +59,7 @@ export async function PUT(
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
-) {
+): Promise<NextResponse> {
   try {
     const user = requireAuth(request);
     await connectDB();
@@ -80,8 +80,8 @@ export async function DELETE(
       { message: 'Vault item deleted successfully' },
       { status: 200 }
     );
-  } catch (error: any) {
-    if (error.message === 'Authentication required') {
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === 'Authentication required') {
       return NextResponse.json(
         { message: 'Authentication required' },
         { status: 401 }

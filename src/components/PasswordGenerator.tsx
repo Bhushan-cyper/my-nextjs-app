@@ -30,7 +30,7 @@ export default function PasswordGenerator({ onPasswordGenerated }: PasswordGener
       if (onPasswordGenerated) {
         onPasswordGenerated(newPassword);
       }
-    } catch (error) {
+    } catch {
       setStrength({ score: 0, feedback: 'Error generating password' });
     }
   }, [options, onPasswordGenerated]);
